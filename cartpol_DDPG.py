@@ -61,23 +61,25 @@ def main():
 
             if done :
                 if step <= MAX_EP_STEPS:
-                    var *= 0.9993              #系数衰减 0.9992 0.9993
                     R.discount_normal_reward() #计算本回合的奖励贴现
                     for j in range(R.memcount):
                         record = R.mem[j:j+1,]
                         agent.R.append_record(record)  #将状态存到agent中
 
                     if(agent.R.memcount >= batchsize ):
+                        var *= 0.997
                         agent.learn('all')
                         learned = True
                 break
             else:
                 #杆子没有倒，已达最大步 训练
                 if step == MAX_EP_STEPS:
+                    #计算奖励贴现值
                     R.discount_normal_reward()
                     for j in range(R.memcount):
                         record = R.mem[j:j+1,]
                         agent.R.append_record(record)
+                    var *= 0.9995              #系数衰减 0.9992 0.9993
                     agent.learn('all')
                     learned = True
                     #RENDER = True
@@ -92,7 +94,7 @@ def main():
                         break
             s = s_  #当前状态等于下一个状态
 
-        print("episode={:d}，done={},learned={}, maxstep={}".format(episode,done,learned,step))
+        print("episode={:d}，done={},learned={},var={:.4f}, maxstep={}".format(episode,done,learned,var,step))
 
 
 
